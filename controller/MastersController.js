@@ -2,12 +2,27 @@ import mongoose from 'mongoose';
 import Masters from '../models/MastersModel.js';
 
 
-const getMastersList = async (req, res, next) => {
+const getMastersList = async (req, res) => {
   try {
-    let data = await Masters.find()
-    res.status(200).json({ data })
+    const masters = await Masters.aggregate([
+      {
+        $group: {
+          _id: "$Type",
+          documents: {
+            $push: {
+              Code: "$Code",
+              Value: "$Value",
+              Tags: "$Tags",
+              Parentid: "$Parentid",
+            },
+          },
+        },
+      },
+    ])
+
+    res.status(200).json({ success: true, data: masters })
   } catch (error) {
-    res.status(400).json({ messgae: "An error Occoured" })
+    res.status(500).json({ success: false, error: error.message })
   }
 }
 
