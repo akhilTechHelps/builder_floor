@@ -5,7 +5,53 @@ import properties from '../models/propertiesModel.js';
 const getpropertiesList = async (req, res, next) => {
   try {
     let data = await properties.find()
-    res.status(200).json({ data })
+    const filter = req.query.filter;
+
+    let filteredProperties = data;
+
+    if (filter) {
+      const parsedFilter = JSON.parse(filter);
+
+      if (parsedFilter.cities && parsedFilter.cities.length > 0) {
+        filteredProperties = filteredProperties.filter(property => parsedFilter.cities.includes(property.City));
+      }
+
+      if (parsedFilter.accommodation && parsedFilter.accommodation.length > 0) {
+        filteredProperties = filteredProperties.filter(property => parsedFilter.accommodation.includes(property.Accommodation));
+      }
+
+      if (parsedFilter.facing && parsedFilter.facing.length > 0) {
+        filteredProperties = filteredProperties.filter(property => parsedFilter.facing.includes(property.Facing));
+      }
+
+      if(parsedFilter.locations && parsedFilter.locations.length > 0) {
+        filteredProperties = filteredProperties.filter(property => parsedFilter.locations.includes(property.Location));
+      }
+
+      if(parsedFilter.floors && parsedFilter.floors.length > 0) {
+        filteredProperties = filteredProperties.filter(property => parsedFilter.floors.includes(property.Floor));
+      }
+
+      if(parsedFilter.possession && parsedFilter.floors.possession > 0) {
+        filteredProperties = filteredProperties.filter(property => parsedFilter.possession.includes(property.Possession));
+      }
+
+      if (parsedFilter.priceRange && parsedFilter.priceRange.length === 2) {
+        const [minPrice, maxPrice] = parsedFilter.priceRange;
+        filteredProperties = filteredProperties.filter(property => property.Price >= minPrice && property.Price <= maxPrice);
+      }
+
+      if (parsedFilter.sizeRange && parsedFilter.sizeRange.length === 2) {
+        const [minSize, maxSize] = parsedFilter.sizeRange;
+        filteredProperties = filteredProperties.filter(property => property.Size >= minSize && property.Size <= minSize);
+      }
+
+      res.status(200).json(filteredProperties);
+
+    }
+    else{
+      res.status(200).json({ data })
+    }
   } catch (error) {
     res.status(400).json({ messgae: "An error Occoured" })
   }

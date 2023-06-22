@@ -1,13 +1,33 @@
-import mongoose from 'mongoose';
-import Masters from '../models/MastersModel.js';
+import mongoose from "mongoose"
+import Masters from "../models/MastersModel.js"
 
-
-const getMastersList = async (req, res, next) => {
+const getMastersList = async (req, res) => {
   try {
-    let data = await Masters.find()
-    res.status(200).json({ data })
+    const masters = await Masters.aggregate([
+      {
+        $group: {
+          _id: "$Type",
+          documents: {
+            $push: {
+              Code: "$Code",
+              Value: "$Value",
+              Tags: "$Tags",
+              Label : "$Label",
+              Parentid: "$Parentid",
+            },
+          },
+        },
+      },
+    ])
+
+    const data = masters.reduce((acc, cur) => {
+      acc[cur._id] = cur.documents;
+      return acc;
+    }, {});
+
+    res.status(200).json({ success: true, data: data })
   } catch (error) {
-    res.status(400).json({ messgae: "An error Occoured" })
+    res.status(500).json({ success: false, error: error.message })
   }
 }
 
@@ -44,14 +64,14 @@ const deleteMastersById = async (req, res, next) => {
 
 const deleteMastersByID = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const result = await Masters.findByIdAndRemove(id);
+    const id = req.params.id
+    const result = await Masters.findByIdAndRemove(id)
     if (!result) {
-      return res.status(404).json({ message: 'Masters not found' });
+      return res.status(404).json({ message: "Masters not found" })
     }
-    res.status(200).json({ message: "Masters deleted successfully" });
+    res.status(200).json({ message: "Masters deleted successfully" })
   } catch (error) {
-    res.status(400).json({ message: "An error Occurred" });
+    res.status(400).json({ message: "An error Occurred" })
   }
 }
 
@@ -64,7 +84,6 @@ const storeMasters = async (req, res, next) => {
     res.status(400).json({ messgae: err.message })
   }
 }
-
 
 const updateBulkMasters = async (req, res, next) => {
   try {
@@ -107,5 +126,5 @@ export default {
   deleteMastersById,
   updateMastersByID,
   updateBulkMasters,
-  insertBulkMasters
+  insertBulkMasters,
 }
