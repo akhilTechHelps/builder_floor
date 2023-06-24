@@ -146,6 +146,19 @@ const insertBulkproperties = async (req, res, next) => {
   }
 }
 
+const getSimilarProperties = async(req, res) => {
+  const city = req.query.city;
+
+  properties.find({ City: city }, (err, properties) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: 'An error occurred while fetching properties.' });
+    } else {
+      res.json(properties);
+    }
+  });
+});
+
 export default {
   getpropertiesList,
   storeproperties,
@@ -153,5 +166,6 @@ export default {
   deletepropertiesById,
   updatepropertiesByID,
   updateBulkproperties,
-  insertBulkproperties
+  insertBulkproperties,
+  getSimilarProperties
 }
