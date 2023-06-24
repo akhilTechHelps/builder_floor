@@ -9,6 +9,7 @@ router
   .get("/list", propertiesController.getpropertiesList)
   .put("/", propertiesController.updatepropertiesByID)
   .delete("/", propertiesController.deletepropertiesById)
+  .get("/properties/similar",propertiesController.getSimilarProperties)
   .post("/bulkInsert", uploader.single("fileCSV"), propertiesController.insertBulkproperties)
   .post("/bulkUpdate", uploader.single("fileCSV"),propertiesController.updateBulkproperties)
 
