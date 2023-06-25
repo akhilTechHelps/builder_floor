@@ -157,7 +157,7 @@ const getSimilarProperties = async(req, res) => {
       res.json(properties);
     }
   });
-});
+}
 
 export default {
   getpropertiesList,
